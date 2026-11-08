@@ -123,7 +123,7 @@ function M.ConfigureLayout(layout)
                 Setting(system, Enum.EditModeActionBarSetting, "IconSize", 60)
             end
         elseif id == E.Minimap then
-            Anchor(system, "TOPRIGHT", "TOPRIGHT", -12, -8)
+            Anchor(system, "BOTTOM", "BOTTOM", 0, g.mapBottom-8)
             Setting(system, Enum.EditModeMinimapSetting, "Size", 50)
         elseif id == E.UnitFrame then
             if index == U.Player then
@@ -203,7 +203,7 @@ end
 
 -- Advance this only when generated native layout geometry needs a migration.
 -- Cosmetic updates and ordinary login must retain the user's Edit Mode changes.
-local layoutRevision = 5
+local layoutRevision = 6
 local function LayoutInputs()
     return {revision=layoutRevision, width=UIParent:GetWidth(), height=UIParent:GetHeight(),
         scale=M.db.scale, unitframes=M.db.unitframes,groupframes=M.db.groupframes}

@@ -29,7 +29,7 @@ local function MapFont(text,parent,width,height,minimum)
     if not text then return end
     SaveMapPiece(text)
     local font,_,flags=unpack(mapPieces[text].font)
-    text:SetFont(font,minimum/parent:GetEffectiveScale(),flags)
+    text:SetFont(font,math.max(minimum,12*UIParent:GetEffectiveScale())/parent:GetEffectiveScale(),flags)
     text:ClearAllPoints()
     text:SetPoint("CENTER",parent,"CENTER",0,0)
     text:SetSize(width,height)
@@ -38,18 +38,19 @@ local function MapFont(text,parent,width,height,minimum)
     text:SetNonSpaceWrap(false)
 end
 
-local function LayoutMapControls()
+local function LayoutMapControls(mapSize)
     local g=M.geometry
+    mapSize=mapSize or g.mapSize
     local zone=MinimapCluster.ZoneTextButton
     local labelHeight=math.max(14,10/UIParent:GetEffectiveScale())
-    MapPiece(zone,"TOP",Minimap,"TOP",0,-2,1,g.mapSize-4,labelHeight)
+    MapPiece(zone,"TOP",Minimap,"TOP",0,-2,1,mapSize-4,labelHeight)
     if zone then
-        MapFont(MinimapZoneText,zone,g.mapSize-8,labelHeight,8)
+        MapFont(MinimapZoneText,zone,mapSize-8,labelHeight,8)
         for _,texture in pairs({zone.StateTexture,zone.AddTexture}) do
             SaveMapPiece(texture)
             texture:ClearAllPoints()
             texture:SetPoint("CENTER",zone,"CENTER",0,0)
-            texture:SetSize(g.mapSize-4,labelHeight)
+            texture:SetSize(mapSize-4,labelHeight)
         end
     end
     -- Native buttons keep their click handlers, notifications and tooltips.
@@ -58,9 +59,10 @@ local function LayoutMapControls()
     MapPiece(MinimapCluster.IndicatorFrame,"RIGHT",Minimap,"LEFT",-3,0,0.8)
     MapPiece(AddonCompartmentFrame,"LEFT",Minimap,"RIGHT",3,0,0.7)
     MapPiece(MinimapCluster.InstanceDifficulty,"RIGHT",Minimap,"BOTTOMLEFT",-3,10,0.7)
+    MapPiece(MinimapCluster.DielFrame,"LEFT",Minimap,"BOTTOMRIGHT",3,10,0.4)
     local coords=MinimapCluster.MinimapContainer.PlayerCoords
-    MapPiece(coords,"BOTTOM",Minimap,"BOTTOM",0,2,1,g.mapSize-4,labelHeight)
-    if coords then MapFont(coords.CoordText,coords,g.mapSize-4,labelHeight,7) end
+    MapPiece(coords,"BOTTOM",Minimap,"BOTTOM",0,2,1,mapSize-4,labelHeight)
+    if coords then MapFont(coords.CoordText,coords,mapSize-4,labelHeight,7) end
     -- This optional native clock has its own visibility preference. Give it
     -- room rather than stacking it on the now compact location label.
     MapPiece(TimeManagerClockButton,"TOPRIGHT",UIParent,"TOPRIGHT",-12,-8,1,80,20)
@@ -184,22 +186,34 @@ end
 function M.ApplyMinimap()
     local container = MinimapCluster.MinimapContainer
     if not mapBackup then
+        local fw,fh=MinimapCluster:GetFixedSize()
         mapBackup = {ignore=container.ignoreInLayout, border=MinimapCompassTexture:GetAlpha(),
-            underlay=MinimapCompassTextureUnderlay:GetAlpha()}
+            underlay=MinimapCompassTextureUnderlay:GetAlpha(),fixedWidth=fw,fixedHeight=fh,
+            hitRect={MinimapCluster:GetHitRectInsets()}}
     end
-    -- Keep map, location and native utility controls in one bottom-center area.
+    -- Move the native system, including its Edit Mode selection, as one unit.
+    -- Child-only absolute anchors left the old selection in the upper right.
+    local size=math.max(50,math.min(200,MinimapCluster:GetSettingValue(Enum.EditModeMinimapSetting.Size)))
+    local mapSize=M.geometry.mapSize*size/50
     container.ignoreInLayout = true
-    container:SetScale(M.geometry.mapSize/198)
+    MinimapCluster:SetFixedSize(mapSize+44,mapSize+16)
+    MinimapCluster:SetHitRectInsets(22,22,8,8)
+    MinimapCluster:SetEditModeScale(mapSize/198)
     container:ClearAllPoints()
-    container:SetPoint("CENTER",UIParent,"BOTTOM",0,
-        (M.geometry.mapBottom+M.geometry.mapSize/2)/(M.geometry.mapSize/198))
+    container:SetPoint("CENTER",MinimapCluster,"CENTER",0,0)
     Minimap:SetMaskTexture(M.path.."Art\\MazzleUIMinimapMask.blp")
     MinimapCompassTexture:SetAlpha(0)
     MinimapCompassTextureUnderlay:SetAlpha(0)
-    LayoutMapControls()
+    LayoutMapControls(mapSize)
+    MinimapCluster:Layout()
     if not mapHooked then
         hooksecurefunc(MinimapCluster,"UpdateMinimapConfig",function()
             if mapBackup and M.character.enabled then M.RequestLayout() end
+        end)
+        hooksecurefunc(MinimapCluster,"UpdateSystemSettingHeaderUnderneath",function()
+            -- Native size/header edits reset child anchors. Refit presentation
+            -- immediately in Edit Mode, without saving or changing its anchor.
+            if mapBackup and M.character.enabled and not InCombatLockdown() then M.ApplyMinimap() end
         end)
         mapHooked=true
     end
@@ -210,12 +224,18 @@ function M.RestoreMinimap()
     local backup=mapBackup
     mapBackup=nil
     RestoreMapControls()
+    MinimapCluster:SetFixedSize(backup.fixedWidth,backup.fixedHeight)
+    MinimapCluster:SetHitRectInsets(unpack(backup.hitRect))
     MinimapCluster.MinimapContainer.ignoreInLayout=backup.ignore
     MinimapCompassTexture:SetAlpha(backup.border)
     MinimapCompassTextureUnderlay:SetAlpha(backup.underlay)
     MinimapCluster:UpdateMinimapConfig()
     MinimapCluster:UpdateSystemSettingSize()
 end
+
+EventRegistry:RegisterCallback("EditMode.Enter",function()
+    if mapBackup and M.character.enabled and not InCombatLockdown() then M.ApplyMinimap() end
+end)
 
 EventRegistry:RegisterCallback("EditMode.Exit",function()
     if mapBackup and M.character.enabled then M.RequestLayout() end

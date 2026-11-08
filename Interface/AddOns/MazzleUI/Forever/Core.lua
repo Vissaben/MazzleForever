@@ -1,7 +1,7 @@
 -- MazzleUI Forever: an independent port of the original MazzleUI compilation.
 -- Original MazzleUI artwork/code notices remain with the supplied files.
 local addon, M = ...
-M.version = "1.18-forever.7"
+M.version = "1.18-forever.8"
 M.defaults = { skin = "MazzleUI_Skin_Noob123_BlackMetal",
     scale = 1, hud = true, models = true, viewport = false, context = true, unitframes = true, groupframes = true, chatdock = true }
 M.path = "Interface\\AddOns\\MazzleUI\\"

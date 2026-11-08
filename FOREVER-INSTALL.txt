@@ -1,4 +1,4 @@
-MazzleUI 1.18 - independent WoW: Forever port, preview 7 (GUI work in progress)
+MazzleUI 1.18 - independent WoW: Forever port, preview 8 (GUI work in progress)
 Target: WoW: Forever 1.60.1.70862, Interface 16001
 
 This port uses the ORIGINAL MazzleUI compilation in this folder. FauxMazzle is
@@ -95,8 +95,12 @@ Native raid-style party/raid frames remain available. New pool members created
 during combat keep native art until styling is safe. Restore recovers original
 parents, dimensions, artwork, anchors and hit areas.
 The minimap uses the original square mask and correctly aligned border atlas.
-It remains centered in the artwork. The native location label overlays its top
-edge, and tracking, mail/indicators, calendar and addon controls sit alongside it.
+Its native frame, Edit Mode selection and controls now share the same anchor.
+The default position is centered in the artwork. Native size adjustment passed
+the live check; dragging did not produce the expected displacement and remains
+unresolved despite passing offline anchor-preservation checks.
+The location label overlays its top edge. Tracking, mail/indicators, calendar,
+addon controls and the native day/night indicator sit alongside the map.
 Native coordinate text, when enabled by the user's preference, sits inside its
 bottom edge. The optional clock remains at the upper right. Native clicks and
 location tooltips are retained; fonts, sizes and anchors restore on disable.
@@ -118,8 +122,13 @@ copied or parsed. Click Combat Log for native options; mouse-wheel scrolling
 remains available. Dock/hidden state and placement restore, including preview-6
 backups. No additional chat window IDs are taken over.
 Empty native action slots are hidden until populated; all 48 slots remain usable.
-The native micro menu and fitted XP/reputation bars remain above the right panel.
-Actions sits beside them. Their final presentation still needs reference review.
+The Menu header toggles a secure wrapper around the existing native micro menu.
+The menu starts collapsed and appears above the fitted XP/reputation bars. Edit
+Mode reveals it, then restores its prior visibility when editing ends. Native
+button behavior remains in use; restore recovers the original parent. Actions
+sits beside the popout. The XP/reputation bar now sits just above the artwork.
+The group-control drawer keeps its arrow and full expanded controls; only its
+tall background strip is transparent while collapsed. Restore recovers its alpha.
 Player buffs
 use eight columns above the player panel and grow upward. Debuffs have a separate
 area above all four possible buff rows; native durations and interactions remain.
@@ -183,14 +192,22 @@ log-text diagnostic could be entered, so input stopped. No diagnostic message wa
 sent. The supplied original screenshot is retained under
 .validation/reference-original-ui.png for development only.
 
-GUI WORK IS STILL THE PRIORITY. The native minimap Edit Mode selection box remains
-at the old upper-right anchor even though the actual map is bottom-center. The
-thin strip on the left is Blizzard's group-control drawer, not another chat pane.
-Its presentation, the map's Edit Mode handle, target aura placement, native label
-readability and other remaining GUI details need further review before returning
-to the compilation's unported functional features. Preview 6 has no new combat
-validation; actual aura cancellation, maximum live buff counts and coordinate
-display were not exercised during the layout check.
+Preview 8 passes offline checks for minimap selection bounds, native drag-anchor
+preservation and size changes, map control restoration, secure micro-menu toggle
+snippets, Edit Mode visibility and native menu-parent restoration. Expanded and
+collapsed group-drawer states retain their original background alpha on restore.
+Its live idle check verified Menu opening/closing, group drawer expansion and
+collapse, the minimap selection over the actual map, and native size adjustment.
+The drag check did not produce the expected displacement with snapping on or off;
+movement remains unresolved. Temporary changes were reverted, snapping restored
+to enabled, and Edit Mode closed. No Lua error was observed. No combat, character
+movement, item changes or outgoing chat were used in this check.
+
+GUI WORK IS STILL THE PRIORITY. Target aura/cast-bar placement, native/unit text
+readability, combat-log wrapping and other reference details need further review
+before returning to the compilation's unported functional features. Preview 8 has
+no new combat validation. Actual aura cancellation, maximum live buff counts and
+native coordinate display remain unverified in the newer layouts.
 No obsolete third-party addons are bundled. The old source files and manifests
 are retained in the development folder for subsequent porting work.
 

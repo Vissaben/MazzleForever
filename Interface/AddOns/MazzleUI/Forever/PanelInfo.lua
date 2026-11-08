@@ -1,6 +1,17 @@
 -- Independent presentation of the original right panel, using native APIs.
 local _, M = ...
 local panel, memory, elapsed, memoryElapsed = nil,0,0,30
+local microMenu, microParent, microBeforeEdit
+
+local function ApplyMicroMenu()
+    if not MicroMenuContainer then return end
+    if not microParent then
+        microParent=MicroMenuContainer:GetParent()
+        MicroMenuContainer:SetParent(microMenu)
+        microMenu:Hide()
+    end
+    panel.menuButton:SetAttribute("enabled",true)
+end
 
 local function Text(parent, color)
     local text=parent:CreateFontString(nil,"OVERLAY")
@@ -65,7 +76,26 @@ function M.ApplyPanelInfo()
         panel=CreateFrame("Frame","MazzleUIForeverInfo",UIParent)
         panel:SetFrameStrata("LOW")
         panel.performance=Text(panel); panel.network=Text(panel)
-        panel.title=Text(panel,{0.78,0.8,0.79}); panel.title:SetText("MazzleUI")
+        microMenu=CreateFrame("Frame","MazzleUIForeverMicroMenu",UIParent,"SecureHandlerBaseTemplate")
+        microMenu:SetAllPoints(UIParent)
+        microMenu:EnableMouse(false)
+        microMenu:Hide()
+        panel.menuButton=CreateFrame("Button","MazzleUIForeverMenuToggle",panel,"SecureHandlerClickTemplate")
+        panel.menuButton:RegisterForClicks("AnyUp")
+        panel.menuButton:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")
+        panel.menuButton:SetFrameRef("menu",microMenu)
+        panel.menuButton:SetAttribute("_onclick",[[
+            if not self:GetAttribute("enabled") then return end
+            local menu=self:GetFrameRef("menu")
+            if menu:IsShown() then menu:Hide() else menu:Show() end
+        ]])
+        panel.menuButton:SetScript("OnEnter",function(self)
+            GameTooltip:SetOwner(self,"ANCHOR_TOP")
+            GameTooltip:SetText("Show or hide the native game menu buttons.")
+            GameTooltip:Show()
+        end)
+        panel.menuButton:SetScript("OnLeave",function() GameTooltip:Hide() end)
+        panel.title=Text(panel.menuButton,{0.78,0.8,0.79}); panel.title:SetText("Menu")
         panel.money=Text(panel); panel.bags=Text(panel)
         panel.amount=Text(panel,{1,0.9,0.55}); panel.rate=Text(panel,{1,0.9,0.55})
         panel.damageLabel=Text(panel,{0.65,0.65,0.65}); panel.damageLabel:SetText("Damage")
@@ -108,6 +138,9 @@ function M.ApplyPanelInfo()
     Place(panel.performance,0,0,w*0.6,line,g.infoFont)
     Place(panel.network,0,line,w*0.64,line,g.infoFont)
     Place(panel.title,w*0.6,0,w*0.4-20,line,g.infoFont,"RIGHT")
+    panel.menuButton:ClearAllPoints()
+    panel.menuButton:SetPoint("TOPRIGHT",panel,"TOPRIGHT",-20,0)
+    panel.menuButton:SetSize(w*0.4-20,line)
     Place(panel.money,w*0.64,line,w*0.36,line,g.infoFont,"RIGHT")
     Place(panel.bags,0,h-g.logHeight-26*g.bagsScale,g.damageWidth,24*g.bagsScale,g.infoFont)
     for _,item in ipairs({{panel.damage,0,g.damageWidth},{panel.combat,g.damageWidth+g.logGap,g.combatWidth}}) do
@@ -127,9 +160,26 @@ function M.ApplyPanelInfo()
     panel.divider:SetPoint("BOTTOMLEFT",panel,"BOTTOMLEFT",g.damageWidth+g.logGap/2,0)
     panel.divider:SetSize(1,g.logHeight)
     panel:Show()
+    ApplyMicroMenu()
     M.UpdatePanelInfo()
 end
 
 function M.RestorePanelInfo()
-    if panel then panel:Hide() end
+    if panel then
+        panel.menuButton:SetAttribute("enabled",false)
+        panel:Hide()
+    end
+    if microParent then MicroMenuContainer:SetParent(microParent); microParent=nil end
+    if microMenu then microMenu:Hide() end
+    microBeforeEdit=nil
 end
+
+EventRegistry:RegisterCallback("EditMode.Enter",function()
+    if not microParent or InCombatLockdown() then return end
+    microBeforeEdit=microMenu:IsShown()
+    microMenu:Show()
+end)
+EventRegistry:RegisterCallback("EditMode.Exit",function()
+    if microParent and not InCombatLockdown() then microMenu:SetShown(microBeforeEdit==true) end
+    microBeforeEdit=nil
+end)

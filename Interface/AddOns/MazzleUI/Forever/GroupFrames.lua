@@ -4,6 +4,16 @@ local _, M = ...
 local P = M.UnitPresentation
 local views, byOwner = {}, {}
 local pending, scheduled, hooked, active, partyStrip, backgroundAlpha
+local drawerAlpha, drawerHooked
+
+local function StyleDrawer()
+    local drawer=CompactRaidFrameManager
+    if not active or not drawer or not drawer.Background then return end
+    if drawerAlpha==nil then drawerAlpha=drawer.Background:GetAlpha() end
+    -- Keep the native arrow, group controls and expanded panel functional.
+    -- Only the collapsed drawer's tall decorative strip is removed.
+    drawer.Background:SetAlpha(drawer.collapsed and 0 or drawerAlpha)
+end
 
 local function RememberPoints(region)
     local points = {}
@@ -170,6 +180,7 @@ end
 
 function M.RestoreGroupFrames()
     active, pending = false, false
+    if drawerAlpha~=nil then CompactRaidFrameManager.Background:SetAlpha(drawerAlpha); drawerAlpha=nil end
     for _, view in ipairs(views) do
         view:Hide()
         view.model:ClearModel()
@@ -238,6 +249,12 @@ end
 function M.ApplyGroupFrames()
     if not M.db.groupframes then M.RestoreGroupFrames(); return end
     active, pending=true, false
+    if not drawerHooked and CompactRaidFrameManager_Expand and CompactRaidFrameManager_Collapse then
+        hooksecurefunc("CompactRaidFrameManager_Expand",StyleDrawer)
+        hooksecurefunc("CompactRaidFrameManager_Collapse",StyleDrawer)
+        drawerHooked=true
+    end
+    StyleDrawer()
     if not hooked and PartyFrame and PartyFrame.InitializePartyMemberFrames then
         hooksecurefunc(PartyFrame,"InitializePartyMemberFrames",function()
             if active then pending=true; Resume() end

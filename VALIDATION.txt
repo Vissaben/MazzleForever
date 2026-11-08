@@ -1,4 +1,4 @@
-MazzleForever 1.18-forever.7 -- GUI milestone, 2026-11-07
+MazzleForever 1.18-forever.8 -- GUI milestone observations, 2026-11-07
 Target: WoW: Forever 1.60.1.70862, Interface 16001.
 
 Offline checks passed: Lua 5.1 syntax; original assets/fonts/masks; native setting
@@ -8,7 +8,7 @@ ratios; original combat-log dock/hidden-state restoration; preview-6 migration;
 header bag bounds; font-before-text initialization; ZIP content consistency.
 These checks are not a WoW security or rendering emulator.
 
-Live idle milestone: the initial font-before-text error was corrected. After the
+Preview 7 live idle milestone: the initial font-before-text error was corrected. After the
 final reload, the information strip rendered with readable text, the in-panel
 backpack opened/closed, Dmg Out opened/closed the full native meter, the Combat
 Log header opened native options, and empty native action slots were hidden.
@@ -20,9 +20,23 @@ Not yet verified in preview 7: real combat-log text wrapping, fresh combat updat
 live restore, combat roster changes, raids, party pets and stance behavior. Prior
 preview milestones and their limits are described in FOREVER-INSTALL.txt.
 
-Remaining GUI: minimap Edit Mode anchor, target auras/cast bar, group-control
-drawer, native/unit text readability, compact micro menu and other reference
-fidelity. The broader compilation port remains incomplete.
+Preview 8 additions pass offline tests: native minimap anchor/selection geometry,
+size changes and drag-anchor preservation; map restoration; secure menu toggle
+snippets; Edit Mode visibility and parent restoration; collapsed/expanded group
+background restoration.
+
+Preview 8 live idle milestone: Menu opened/closed the native micro menu; the
+group drawer expanded with its original background and collapsed to the arrow;
+the minimap selection appeared over the actual bottom-center map; native Size
+adjustment resized the map and selection together and reverted correctly.
+Dragging did not produce the expected displacement, even with snapping off.
+This remains unresolved; offline anchor-preservation checks do not validate
+native mouse movement. All temporary test changes were reverted, snapping was
+restored to enabled, and Edit Mode was closed. Menu/group controls were collapsed.
+No Lua error was observed. No combat, movement, items or outgoing chat were used.
+
+Remaining GUI: target auras/cast bar, native/unit text readability, combat-log
+wrapping and other reference fidelity. The broader compilation port remains incomplete.
 
 Publishing: update source, ZIP and these notes together after meaningful tested
 milestones. Inspect the remote head first; retain existing work and use a

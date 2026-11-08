@@ -118,9 +118,9 @@ function M.ComputeGeometry(width,height)
     g.meterWidth=math.max(250,math.min(400,g.sideWidth))
     g.meterHeight=200
     g.meterBottom=g.height+70
-    g.menuBottom=g.height+8
+    g.menuBottom=g.height+25
     g.bagsBottom=g.logBottom+g.logHeight+3
-    g.statusBottom=g.menuBottom+32
+    g.statusBottom=g.height+3
     local playerScale=style.player.scale*scale
     g.buffBottom=g.playerY+g.playerBounds.top*playerScale+18
     -- Eight columns, four possible buff rows; debuffs get their own clear area.

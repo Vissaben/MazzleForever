@@ -91,6 +91,8 @@ function methods:GetChecked() return self.checked end
 function methods:GetSize() return self.w,self.h end
 function methods:GetWidth() return self.w end
 function methods:GetHeight() return self.h end
+function methods:GetFixedSize() return self.fixedWidth,self.fixedHeight end
+function methods:SetFixedSize(w,h) self.fixedWidth=w; self.fixedHeight=h end
 function methods:GetLeft() return self.points[1] and self.points[1][4] or 0 end
 function methods:GetBottom() return self.points[1] and self.points[1][5] or 0 end
 function methods:SetAllPoints(relative) safe(); self.relative=relative end
@@ -168,6 +170,7 @@ function SecureHandlerWrapScript(frame,event,header,snippet)
     safe(); frame.wraps=frame.wraps or {}; frame.wraps[event]={header=header,snippet=snippet}
 end
 function hooksecurefunc(object,key,callback)
+    if type(object)=='string' then callback=key; key=object; object=_G end
     local original=object[key]
     object[key]=function(...)
         local results={original(...)}
@@ -204,6 +207,7 @@ end
 UIParent=CreateFrame('Frame','UIParent'); UIParent:SetSize(1920,1200)
 WorldFrame=CreateFrame('Frame','WorldFrame'); WorldFrame:SetPoint('TOPLEFT',UIParent,'TOPLEFT',0,0); WorldFrame:SetPoint('BOTTOMRIGHT',UIParent,'BOTTOMRIGHT',0,0)
 MinimapCluster=CreateFrame('Frame','MinimapCluster',UIParent)
+MinimapCluster:SetHitRectInsets(30,10,0,30)
 MinimapCluster.MinimapContainer=CreateFrame('Frame',nil,MinimapCluster)
 Minimap=CreateFrame('Frame','Minimap',MinimapCluster.MinimapContainer)
 Minimap:SetSize(198,198)
@@ -224,12 +228,21 @@ MinimapCluster.MinimapContainer.PlayerCoords:SetSize(90,10)
 MinimapCluster.MinimapContainer.PlayerCoords.CoordText=MinimapCluster.MinimapContainer.PlayerCoords:CreateFontString()
 MinimapCluster.MinimapContainer.PlayerCoords.CoordText:SetSize(90,10)
 GameTimeFrame=CreateFrame('Frame','GameTimeFrame',MinimapCluster)
+MinimapCluster.DielFrame=CreateFrame('Frame',nil,MinimapCluster.MinimapContainer)
+MinimapCluster.DielFrame:SetSize(42,42)
+MinimapCluster.DielFrame:SetPoint('CENTER',MinimapCluster.MinimapContainer,'CENTER',55,86)
 AddonCompartmentFrame=CreateFrame('Frame','AddonCompartmentFrame',MinimapCluster)
 TimeManagerClockButton=CreateFrame('Frame','TimeManagerClockButton',MinimapCluster)
 GameTimeFrame:SetSize(23,23); AddonCompartmentFrame:SetSize(23,23); TimeManagerClockButton:SetSize(40,16)
 DamageMeter=CreateFrame('Frame','DamageMeter',UIParent)
 function DamageMeter:UpdateShownState() self:SetShown(self.visibility~=Enum.DamageMeterVisibility.Hidden) end
 BagsBar=CreateFrame('Frame','BagsBar',UIParent); BagsBar:SetSize(270,45); BagsBar:SetScale(0.75)
+MicroMenuContainer=CreateFrame('Frame','MicroMenuContainer',UIParent)
+CompactRaidFrameManager=CreateFrame('Frame','CompactRaidFrameManager',UIParent)
+CompactRaidFrameManager.Background=CompactRaidFrameManager:CreateTexture()
+CompactRaidFrameManager.collapsed=true
+function CompactRaidFrameManager_Expand() CompactRaidFrameManager.collapsed=false end
+function CompactRaidFrameManager_Collapse() CompactRaidFrameManager.collapsed=true end
 StatusTrackingBarManager=CreateFrame('Frame','StatusTrackingBarManager',UIParent)
 StatusTrackingBarManager.barContainers={}
 for i=1,2 do
@@ -244,9 +257,19 @@ function StatusTrackingBarManager:CheckForLayoutChange()
 end
 MinimapCompassTexture=Minimap:CreateTexture()
 MinimapCompassTextureUnderlay=Minimap:CreateTexture()
-function MinimapCluster:Layout() end
+function MinimapCluster:Layout() self:SetSize(self.fixedWidth or 256,self.fixedHeight or 256) end
+function MinimapCluster:GetSettingValue() return self.sizeSetting or 50 end
+function MinimapCluster:SetEditModeScale(value) self.MinimapContainer:SetScale(value) end
+function MinimapCluster:UpdateSystemSettingHeaderUnderneath()
+    self.MinimapContainer:ClearAllPoints()
+    self.MinimapContainer:SetPoint('TOP',self,'TOP',10,-30)
+    self:Layout()
+end
 function MinimapCluster:UpdateMinimapConfig() Minimap:SetMaskTexture('native-mask') end
-function MinimapCluster:UpdateSystemSettingSize() self.MinimapContainer:SetScale(1) end
+function MinimapCluster:UpdateSystemSettingSize()
+    self:SetEditModeScale(self:GetSettingValue()/100)
+    self:UpdateSystemSettingHeaderUnderneath()
+end
 chatInfo,chatPositions,chatDimensions={},{},{}
 for id=1,4 do
     local frame=CreateFrame('Frame','ChatFrame'..id,UIParent)
@@ -671,7 +694,7 @@ for width, height in ((1024,768),(1280,1024),(1920,1080),(2560,1440),(3440,1440)
     assert (g.logHeight-g.logHeader)/g.combatScale>=120-0.001
     assert g.bagsBottom+45*g.bagsScale<=g.height-10*g.scale-2*g.infoLine
     assert g.bagsBottom>g.logBottom+g.logHeight
-    assert g.meterBottom>g.height and g.statusBottom>=g.menuBottom+30
+    assert g.meterBottom>g.height and g.menuBottom>=g.statusBottom+22
     assert abs(lua.eval('Minimap:GetEffectiveScale()/UIParent:GetEffectiveScale()')*198 - ns.geometry.mapSize)<0.00001
     for system in lua.globals().stored.layouts[1].systems.values():
         if system.system == lua.globals().Enum.EditModeSystem.ActionBar and system.systemIndex <= 4:
@@ -715,6 +738,64 @@ lua.execute(r'''
 
 # Native log restoration covers existing docks, hidden windows and the preview-6
 # migration. No window is renamed and no message filter is replaced.
+lua, ns = boot(before=r'''
+    MinimapCluster:SetFixedSize(280,300)
+    CompactRaidFrameManager.Background:SetAlpha(0.7)
+''')
+lua.execute(r'''
+    local c=MinimapCluster
+    assert(c:GetWidth()==M.geometry.mapSize+44 and c:GetHeight()==M.geometry.mapSize+16)
+    assert(c.MinimapContainer.points[1][2]==c and c.MinimapContainer.points[1][3]=='CENTER')
+    local anchor
+    for _,system in ipairs(stored.layouts[1].systems) do
+        if system.system==Enum.EditModeSystem.Minimap then anchor=system.anchorInfo end
+    end
+    assert(anchor.point=='BOTTOM' and anchor.offsetY==M.geometry.mapBottom-8)
+    c:ClearAllPoints(); c:SetPoint('CENTER',UIParent,'CENTER',90,50)
+    local previous=saves
+    editing=true; EventRegistry['EditMode.Enter']()
+    c.sizeSetting=75; c:UpdateSystemSettingSize()
+    assert(c.MinimapContainer.points[1][2]==c and c.MinimapContainer.points[1][3]=='CENTER')
+    assert(math.abs(c:GetWidth()-(M.geometry.mapSize*1.5+44))<0.00001)
+    assert(c.points[1][4]==90 and c.points[1][5]==50 and saves==previous)
+    assert(MinimapZoneText:GetWidth()==M.geometry.mapSize*1.5-8)
+    c.sizeSetting=0; c:UpdateSystemSettingSize()
+    assert(c:GetWidth()==M.geometry.mapSize+44, 'uninitialized native setting must not produce zero scale')
+    c.sizeSetting=75; c:UpdateSystemSettingSize()
+    editing=false; EventRegistry['EditMode.Exit'](); flush()
+    assert(c.points[1][4]==90 and c.points[1][5]==50, 'cosmetic reapply must preserve the native drag anchor')
+    assert(CompactRaidFrameManager.collapsed and CompactRaidFrameManager.Background:GetAlpha()==0)
+    combat=true; CompactRaidFrameManager_Expand()
+    assert(not CompactRaidFrameManager.collapsed and CompactRaidFrameManager.Background:GetAlpha()==0.7)
+    CompactRaidFrameManager_Collapse()
+    assert(CompactRaidFrameManager.Background:GetAlpha()==0)
+    combat=false; M.Restore()
+    assert(c:GetFixedSize()==280 and c:GetHeight()==300)
+    local left,right,top,bottom=c:GetHitRectInsets()
+    assert(left==30 and right==10 and top==0 and bottom==30)
+    assert(CompactRaidFrameManager.Background:GetAlpha()==0.7)
+    CompactRaidFrameManager_Expand(); CompactRaidFrameManager_Collapse()
+    assert(CompactRaidFrameManager.Background:GetAlpha()==0.7, 'disabled hook changed native art')
+''')
+lua, ns = boot()
+lua.execute(r'''
+    local drawer=MazzleUIForeverMicroMenu
+    local toggle=MazzleUIForeverMenuToggle
+    assert(MicroMenuContainer:GetParent()==drawer and not drawer:IsShown())
+    combat=true; secureSnippet(toggle,'OnClick'); assert(drawer:IsShown())
+    secureSnippet(toggle,'OnClick'); assert(not drawer:IsShown())
+    combat=false; editing=true; EventRegistry['EditMode.Enter'](); assert(drawer:IsShown())
+    editing=false; EventRegistry['EditMode.Exit'](); flush(); assert(not drawer:IsShown())
+    secureSnippet(toggle,'OnClick'); assert(drawer:IsShown())
+    editing=true; EventRegistry['EditMode.Enter']()
+    editing=false; EventRegistry['EditMode.Exit'](); flush(); assert(drawer:IsShown())
+    M.Restore()
+    assert(MicroMenuContainer:GetParent()==UIParent and not drawer:IsShown())
+    secureSnippet(toggle,'OnClick'); assert(not drawer:IsShown())
+    M.character.enabled=true; M.RequestLayout(); flush()
+    assert(MicroMenuContainer:GetParent()==drawer and not drawer:IsShown())
+''')
+
 lua, ns = boot(before="FCF_DockFrame(ChatFrame2,2,false)")
 lua.execute(r'''
     assert(not ChatFrame2.isDocked and ChatFrame2Tab:GetParent()~=UIParent)
@@ -832,4 +913,6 @@ print("PASS: chat/input gutters and physical text size; side-pane bounds; native
 print("minimum sizes; map-control placement/restoration; status-bar width preferences.")
 print("PASS: split combat log preserves filters, restores dock/hidden state, migrates")
 print("preview 6 backups; damage display accepts opaque values; bags fit the header.")
+print("PASS: native minimap anchor/selection bounds and size changes; drawer toggle")
+print("secure snippets; Edit Mode visibility; native parents/hit areas/art restored.")
 print("Not validated: real rendering, combat taint, hardware input, party/raid sessions.")

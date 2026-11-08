@@ -60,6 +60,8 @@ def render(width, height, physical=1):
             columns=12//g['actionRows'];cell=g['actionRow']
             left=width/2+g['gap'] if side==1 else width/2-g['gap']-columns*cell
             for index in range(12):
+                # Sample occupied slots; empty slots are hidden in the runtime.
+                if index not in ((0,1,2,5,8,11) if upper else (0,1,3,4,6,9)):continue
                 bx=left+(index%columns)*cell
                 by=g['actionBottom']+(upper*g['actionRows']+index//columns)*cell
                 rectangle(bx,by,cell-2,cell-2,(35,40,47,255),(110,116,125,255))
@@ -131,7 +133,7 @@ def render(width, height, physical=1):
     top=g['height']-10*g['scale']; line=g['infoLine']
     text_at('17:48   60 FPS',rx,top-line,rw*.6,line,g['infoFont'],'#d7c96f','left')
     text_at('40 ms   2.0 MB',rx,top-2*line,rw*.64,line,g['infoFont'],'#d7c96f','left')
-    text_at('MazzleUI  M',rx+rw*.6,top-line,rw*.4,line,g['infoFont'],'#c4c9c8','right')
+    text_at('Menu  M',rx+rw*.6,top-line,rw*.4,line,g['infoFont'],'#c4c9c8','right')
     text_at('1g 23s 45c',rx+rw*.64,top-2*line,rw*.36,line,g['infoFont'],'#d7c96f','right')
     text_at('Bags: 6/16',rx,g['bagsBottom'],g['damageWidth'],24*g['bagsScale'],g['infoFont'],'#d7c96f','left')
     bs=g['bagsScale']; bx=rx+rw-270*bs
@@ -145,9 +147,7 @@ def render(width, height, physical=1):
         text_at(label,rx,ly+lh-header-2-(i+1)*row,dw,row,g['infoFont'] if i%2==0 else g['logFont'],color,'left')
     for i,label in enumerate(('Your spell hits', 'the target.', 'You gain 45 XP.')):
         text_at(label,rx+dw+g['logGap'],ly+lh-header-(i+1)*(g['logFont']+1),g['combatWidth'],g['logFont']+1,g['logFont'],'#c3c9d0','left')
-    by=g['menuBottom']; bx=width-g['sideInset']-190
-    for i in range(10):rectangle(bx+i*19,by,17,24,(40,45,53,230),(107,115,123,255))
-    text_at('Menu',bx,by,190,24,8/physical,'#d6d6d6')
+    # The native micro menu is collapsed initially; the header opens its popout.
     text_at('XP / reputation',rx,g['statusBottom'],rw,12,7/physical,'#85a6db')
     rectangle(rx-78,g['menuBottom'],62,24,(32,53,66,230))
     text_at('Actions',rx-78,g['menuBottom'],62,24,8/physical,'#d7cd94')

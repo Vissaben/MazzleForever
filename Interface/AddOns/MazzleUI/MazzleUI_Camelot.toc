@@ -2,7 +2,7 @@
 ## Title: MazzleUI |cff3399ccForever|r
 ## Notes: Original MazzleUI artwork with an independent Forever runtime.
 ## Author: Mazzlefizz (original compilation); Forever compatibility port
-## Version: 1.18-forever.7
+## Version: 1.18-forever.8
 ## SavedVariables: MazzleUIForeverDB
 ## SavedVariablesPerCharacter: MazzleUIForeverCharacter
 
