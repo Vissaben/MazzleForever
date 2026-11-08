@@ -1,0 +1,2 @@
+# Preserve source and asset bytes for the build manifest on every platform.
+* -text

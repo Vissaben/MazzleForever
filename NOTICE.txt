@@ -1,0 +1,26 @@
+MazzleForever includes material from the user-supplied original MazzleUI 1.18
+compilation (docevl patched). Original artwork, fonts, skin definitions and
+Mazzifier profile data retain their original authors' terms and notices.
+
+The repository's pre-existing Apache-2.0 LICENSE has been preserved. It does not
+relicense the original compilation or assert permission from its authors.
+Original headers remain in the included source files and generated UnitStyles.
+FauxMazzle code/assets/fonts/settings/tests are not included.
+
+Original Mazzifier profile notice (preserved verbatim below):
+
+-- Copyright © 2006 Mazin Assanie
+-- All Rights Reserved.
+-- 
+-- Permission to use, copy, modify, and distribute this software in any way
+-- is not granted without expressed written agreement.  In the case that it
+-- is granted, the above copyright notice and this paragraph must appear in
+-- all copies, modifications, and distributions.  This copyright applies
+-- to the all of the code, data and artwork in the add-ons MazzleUI,
+-- Mazzifier, Mazz3D, and MazzleOptions, as well as artwork found in
+-- the custom textures folders of Discord Art and Discord Unit Frames.
+--
+-- To contact the author of this work, use mazzlefizz@gmail.com 
+-- For more information on copyright, visit http://copyright.gov/ or http://whatiscopyright.org/
+--
+

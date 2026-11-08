@@ -1,0 +1,22 @@
+## Interface: 16001
+## Title: MazzleUI |cff3399ccForever|r
+## Notes: Original MazzleUI artwork with an independent Forever runtime.
+## Author: Mazzlefizz (original compilation); Forever compatibility port
+## Version: 1.18-forever.7
+## SavedVariables: MazzleUIForeverDB
+## SavedVariablesPerCharacter: MazzleUIForeverCharacter
+
+Forever\Skins.lua
+Forever\UnitStyles.lua
+Forever\Geometry.lua
+Forever\Core.lua
+Forever\Layout.lua
+Forever\Chat.lua
+Forever\PanelInfo.lua
+Forever\UnitFrames.lua
+Forever\GroupFrames.lua
+Forever\Art.lua
+Forever\HUD.lua
+Forever\Context.lua
+Forever\Installer.lua
+Forever\Options.lua

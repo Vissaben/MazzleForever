@@ -1,0 +1,37 @@
+# Publish only the port, its original assets/profile inputs, and build tools.
+# Historical compilation files, WTF backups, screenshots and validation caches stay local.
+*
+!.gitignore
+!.gitattributes
+!README.md
+!LICENSE
+!NOTICE.txt
+!FOREVER-INSTALL.txt
+!VALIDATION.txt
+!MazzleUI-Forever.zip
+!tools/
+!tools/*.py
+!Fonts/
+!Fonts/ARIALN.ttf
+!Fonts/FRIZQT__.ttf
+!Interface/
+!Interface/AddOns/
+!Interface/AddOns/MazzleUI/
+!Interface/AddOns/MazzleUI/MazzleUI_Camelot.toc
+!Interface/AddOns/MazzleUI/Art/
+!Interface/AddOns/MazzleUI/Art/*
+!Interface/AddOns/MazzleUI/Forever/
+!Interface/AddOns/MazzleUI/Forever/**
+!Interface/AddOns/MazzleUI_Default_Skin/
+!Interface/AddOns/MazzleUI_Default_Skin/*.blp
+!Interface/AddOns/MazzleUI_Default_Skin/core.lua
+!Interface/AddOns/MazzleUI_Default_Skin/*_Camelot.toc
+!Interface/AddOns/MazzleUI_Skin_*/
+!Interface/AddOns/MazzleUI_Skin_*/*.blp
+!Interface/AddOns/MazzleUI_Skin_*/core.lua
+!Interface/AddOns/MazzleUI_Skin_*/*_Camelot.toc
+!Interface/AddOns/Mazzifier/
+!Interface/AddOns/Mazzifier/DUF/
+!Interface/AddOns/Mazzifier/DUF/DUF_1_6.lua
+!Interface/AddOns/Mazzifier/DUF/DUF_1_33.lua
+!Interface/AddOns/Mazzifier/DUF/DUF_1_25.lua

@@ -1,0 +1,217 @@
+MazzleUI 1.18 - independent WoW: Forever port, preview 7 (GUI work in progress)
+Target: WoW: Forever 1.60.1.70862, Interface 16001
+
+This port uses the ORIGINAL MazzleUI compilation in this folder. FauxMazzle is
+consulted for compatibility hints only; its code, runtime, fonts, textures,
+settings, and tests are not copied into this package.
+
+INSTALL THE ZIP, NOT THE ENTIRE HISTORICAL COMPILATION
+
+This preview includes derived HUD mask textures and private copies of this compilation's
+fonts. Fully exit and restart WoW after installing; /reload alone may not discover
+new texture/font files. Original global Fonts files are not replaced.
+
+1. Exit WoW completely.
+2. Back up any existing MazzleUI addon folders. Keep your WTF and Fonts folders.
+3. Extract MazzleUI-Forever.zip into:
+   World of Warcraft/_forever_/Interface/AddOns/
+   The resulting path must include AddOns/MazzleUI/MazzleUI_Camelot.toc.
+4. Enable MazzleUI. Disable other complete UI replacements for this test.
+   The skin folders contain artwork; they do not need to be enabled.
+5. Enter the world. /mazzify opens setup; choose Apply layout for this character.
+   /mazzle options opens settings. /mazzle status reports the version.
+
+The installer does not erase WTF, change bindings, place spells on action slots,
+or change global font files. Old Mazzifier/Ace2/Bongos scripts are not loaded.
+Its modern layout uses a new character-specific Edit Mode layout. The previous
+layout and action-bar visibility preferences are saved for /mazzle restore.
+Account-wide artwork preferences use MazzleUIForeverDB; character enablement
+and backups use MazzleUIForeverCharacter. New characters start with the setup
+screen; their layout is not changed until Apply. Legacy settings are not imported.
+Your changes to the generated native layout survive login, combat exit and
+cosmetic settings changes. /mazzle apply rebuilds its positions deliberately.
+Changing display dimensions, panel scale or original unit/group-frame mode also rebuilds
+positions to fit the artwork. A layout-format upgrade may require one rebuild.
+
+COMMANDS
+
+/mazzify                 Open Mazzifier setup and review changes
+/mazzle options          Open native settings
+/mazzle apply            Rebuild the MazzleUI layout's generated positions
+/mazzle skin <name>      Select one of the 14 original skins
+/mazzle scale 0.75-1.25  Adjust panel and HUD size
+/mazzle hud              Toggle the original curved health/power display
+/mazzle models           Toggle full unit models, including the target cave
+/mazzle viewport         Toggle the original reduced world view (off initially)
+/mazzle actions          Open/close the two-page action grid outside combat
+/mazzle context          Enable/disable the Actions button
+/mazzle unitframes       Switch between original player/target panels and native art
+/mazzle groupframes      Switch between original pet/party panels and native art
+/mazzle chatdock         Dock/restore existing open chat windows
+/mazzle restore          Restore the previous layout and bar preferences
+/mazzle enable           Re-enable the layout
+/mazzle status           Show client and addon versions
+/mazzle reset            Reset this port's preferences and reapply
+
+WHAT IS PORTED
+
+Original four-piece panels, all 14 skins, target cave and full target model,
+original curved health/power artwork, options button and native settings.
+Mazzifier reviews the skin, scale and optional displays before applying them.
+The original two-page 4x4 action grid has a new secure implementation. Its 32
+slots share native action bars 6-8 (145-176), avoiding the old class/form slots.
+Editing either view changes the same action slot. No spells are auto-filled.
+Use the Actions button or assign Toggle action grid under Key Bindings >
+MazzleUI. Page buttons and the mouse wheel over the grid switch pages.
+Native action bars provide 48 arranged slots, preserving bindings, action pages,
+stance/pet/vehicle handling. The native minimap, unit frames, auras, cast bar,
+group frames, bags, micro menu, XP/reputation and tracker are arranged around
+the panel. All protected layout operations defer until combat ends.
+Health/power values go directly to native display widgets without Lua arithmetic.
+Player and target presentation now derives from the original Mazzifier DUF
+profiles for widescreen, 4:3 and 5:4. The player uses horizontal bars and a full
+model; the target uses vertical bars around the cave. Native unit buttons retain
+targeting, menus, contextual indicators and aura handling. Class-resource content
+remains under native control. /mazzle restore restores the hidden native artwork.
+The missing external Discord bar texture uses Blizzard's status-bar texture.
+Bundled original ARIALN and FRIZQT__ fonts replace unavailable external DUF fonts.
+Existing open chat windows, except the native combat log, dock into the left panel
+without changing filters or messages. Their former placement, lock and click-through preferences are backed
+up. Temporary whisper windows are excluded. Restore skips renamed/reused windows.
+Chat now fits the tall inner section of the original left artwork, with separate
+space for native tabs, menu/social buttons and the input field. Small panes scale
+within native sizing limits; message and entry text have a nine-pixel minimum.
+Temporary fonts/scales restore with the other chat preferences.
+Pet and party panels use the original DUF model/pedestal, bars and text geometry
+at their original proportions. The pet sits beside the player; two party panels
+sit on each side of the target cave. Existing native party buttons are children
+of a private strip outside Blizzard's layout tree. Native membership, targeting,
+menus and vehicle units remain in use; a secure visibility driver hides the strip
+outside a party or during a raid. Hit areas match the larger panels. Its position
+currently follows the original artwork, not the native Party Frames drag handle.
+The native four-member Edit Mode preview works. Auras and party-pet controls sit
+above the panels; ready checks and roles remain active.
+Native raid-style party/raid frames remain available. New pool members created
+during combat keep native art until styling is safe. Restore recovers original
+parents, dimensions, artwork, anchors and hit areas.
+The minimap uses the original square mask and correctly aligned border atlas.
+It remains centered in the artwork. The native location label overlays its top
+edge, and tracking, mail/indicators, calendar and addon controls sit alongside it.
+Native coordinate text, when enabled by the user's preference, sits inside its
+bottom edge. The optional clock remains at the upper right. Native clicks and
+location tooltips are retained; fonts, sizes and anchors restore on disable.
+The cave includes its original inherited target-frame scale. Native
+action bars use two rows per side when space permits, or four on narrower screens,
+retaining all 48 slots. Party panels clear the wrapped rows. Labels have minimum
+physical text sizes; small windows omit redundant pet/party percentages and max
+values, while preserving current values, names, classes and the health/power bars.
+The supplied original screenshot now guides the right-panel layout: an information
+strip above narrow Dmg Out and wider Combat Log panes. Time, FPS, latency, addon
+memory, money and bag capacity use current native APIs. The original options
+button and native bag controls sit inside the header. The full native damage
+meter opens above the artwork by clicking Dmg Out; it starts hidden in the new
+layout. The narrow pane shows your current encounter damage and DPS, a modern
+adaptation rather than the old per-hit stream. Restricted amounts pass directly
+through Blizzard's abbreviation function to text widgets, with no Lua arithmetic.
+The native combat log renders the right pane; its filters and messages are not
+copied or parsed. Click Combat Log for native options; mouse-wheel scrolling
+remains available. Dock/hidden state and placement restore, including preview-6
+backups. No additional chat window IDs are taken over.
+Empty native action slots are hidden until populated; all 48 slots remain usable.
+The native micro menu and fitted XP/reputation bars remain above the right panel.
+Actions sits beside them. Their final presentation still needs reference review.
+Player buffs
+use eight columns above the player panel and grow upward. Debuffs have a separate
+area above all four possible buff rows; native durations and interactions remain.
+
+LIMITATIONS / VALIDATION
+
+This is a compatibility preview, not a full reproduction of the 2007 compilation.
+Mazzifier's third-party-addon configuration, the model animation database, FuBar integration,
+raid hot-swap layouts and automated gameplay conveniences are not ported.
+Native unit frames and game features supply gameplay controls. Preview 3 passed
+one live milestone check on build 70862 after a full client restart: HUD fills
+remained visible through self/creature targeting, player/target panels and models
+loaded, chat docked, action-grid buttons and mouse-wheel paging worked, and setup
+restored the prior layout/native artwork and reapplied MazzleUI. No Lua error was
+observed in that session. Preview 4 then loaded without an observed Lua error;
+four original party panels appeared in native Edit Mode preview. A subsequent
+preview 4 session with a real imp and party verified model display, targeting and
+native context menus. During actual combat the grid opened, changed to page 2
+and returned to page 1 with the mouse wheel; HUD health updated. No Lua error was
+observed. The character died during that test; further combat checks stopped.
+Those observations predate preview 5's geometry changes. Preview 5 passes offline
+Lua, sizing, restoration, pool/vehicle, layout persistence and restricted-value
+checks. Offline images at 855x480, 1024x768 and 1920x1080 show static geometry with
+model/map placeholders. Its live layout check verified the smaller square minimap,
+target-cave placement, pet/player arrangement, two action rows per side, readable
+HUD labels and clearance between pet actions, XP, bags and the cave. All four
+original party panels appeared in native Edit Mode preview. The first strip design
+tainted Blizzard's health updates in Edit Mode; moving the strip outside Blizzard's
+layout tree resolved that reproduced error. A subsequent real-party check passed
+Edit Mode entry, four-panel preview, exit, targeting and the native context menu,
+with no observed Lua error. Preview preferences were restored. Real-party models
+were unavailable at the tested distance; preview models and the live imp rendered.
+Combat after the layout changes, real roster changes during combat, raid sessions,
+party pets and stance handling still require validation.
+
+Preview 6 passes the expanded offline checks for side-pane bounds, chat gutters,
+native minimum dimensions, readable text, status-bar sizing and restoration of
+minimap controls. Its live GUI check verified chat input and status output,
+backpack opening/closing, a clear damage-meter header, the fitted XP bar, and the
+relocated Actions button opening/closing its grid. The minimap location button
+opened the world map and retained its full location tooltip. Native Edit Mode
+showed all 32 buff and 16 debuff previews above the player without overlaps; the
+preview preference was restored before leaving Edit Mode. No runtime Lua error
+was observed after the final test reload. An exploratory frame-enumeration chat
+command hit a protected Blizzard frame; that diagnostic is not in the addon.
+The optional clock's text box was widened after this live check to avoid clipping;
+that final width adjustment has offline validation only.
+
+Preview 7 passes the expanded offline checks for split-pane geometry, header bag
+bounds, native combat-log restoration (including docked and hidden windows),
+preview-6 backup migration and damage display with opaque restricted values.
+Its first live load exposed a font-before-text initialization error. That was
+fixed, and the offline harness now enforces the same font requirement. The next
+load succeeded. A final reload verified the enlarged header text and bag icons,
+in-panel backpack opening/closing, the Dmg Out full-meter toggle, native Combat
+Log options, and hidden empty action slots. Existing native encounter values
+appeared in the narrow damage/DPS pane. No further Lua error was observed. The
+native combat log was empty during this idle check; actual message wrapping and
+fresh combat updates have not been validated. PC focus changed before a local
+log-text diagnostic could be entered, so input stopped. No diagnostic message was
+sent. The supplied original screenshot is retained under
+.validation/reference-original-ui.png for development only.
+
+GUI WORK IS STILL THE PRIORITY. The native minimap Edit Mode selection box remains
+at the old upper-right anchor even though the actual map is bottom-center. The
+thin strip on the left is Blizzard's group-control drawer, not another chat pane.
+Its presentation, the map's Edit Mode handle, target aura placement, native label
+readability and other remaining GUI details need further review before returning
+to the compilation's unported functional features. Preview 6 has no new combat
+validation; actual aura cancellation, maximum live buff counts and coordinate
+display were not exercised during the layout check.
+No obsolete third-party addons are bundled. The old source files and manifests
+are retained in the development folder for subsequent porting work.
+
+Offline checks cannot establish in-game rendering, taint freedom, secure input,
+or real party/raid behavior. In-client validation is still required. Start with
+only MazzleUI enabled; test login/reload, target changes, action pages, combat,
+pet/stance bars, party/raid, UI scale, every skin, and /mazzle restore. Enable
+Lua errors with /console scriptErrors 1 and report the first complete error.
+
+The port deliberately checks Interface 16001 before applying its layout.
+Future clients need verification; no addon can promise perpetual compatibility.
+
+DEVELOPMENT
+
+Build: python tools/build_forever.py
+Test:  python tools/test_forever.py
+Proof: python tools/preview_forever.py (static original-art layout, not a screenshot)
+Build/tests require lupa (Lua 5.1) and Pillow; install locally with:
+       python -m pip install --target .validation/python lupa Pillow
+UnitStyles.lua is generated from the original Mazzifier/DUF source tables.
+HUD masks are generated solely from original MazzleUI/Art/HL.blp and ML.blp.
+Reference client UI source is Gethe/wow-ui-source, forever branch, build 70862.
+Reference source and test dependencies are not included in the install archive.
+Original author copyright notices are preserved with the supplied artwork/source.

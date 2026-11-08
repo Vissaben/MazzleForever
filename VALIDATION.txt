@@ -1,0 +1,30 @@
+MazzleForever 1.18-forever.7 -- GUI milestone, 2026-11-07
+Target: WoW: Forever 1.60.1.70862, Interface 16001.
+
+Offline checks passed: Lua 5.1 syntax; original assets/fonts/masks; native setting
+encodings; layout persistence; combat/Edit Mode deferral; opaque restricted
+values; unit/group frame restoration; secure action-grid snippets; five aspect
+ratios; original combat-log dock/hidden-state restoration; preview-6 migration;
+header bag bounds; font-before-text initialization; ZIP content consistency.
+These checks are not a WoW security or rendering emulator.
+
+Live idle milestone: the initial font-before-text error was corrected. After the
+final reload, the information strip rendered with readable text, the in-panel
+backpack opened/closed, Dmg Out opened/closed the full native meter, the Combat
+Log header opened native options, and empty native action slots were hidden.
+Existing encounter damage/DPS appeared in the narrow pane. No further Lua error
+was observed. The test did not involve character movement, combat, item changes
+or outgoing chat.
+
+Not yet verified in preview 7: real combat-log text wrapping, fresh combat updates,
+live restore, combat roster changes, raids, party pets and stance behavior. Prior
+preview milestones and their limits are described in FOREVER-INSTALL.txt.
+
+Remaining GUI: minimap Edit Mode anchor, target auras/cast bar, group-control
+drawer, native/unit text readability, compact micro menu and other reference
+fidelity. The broader compilation port remains incomplete.
+
+Publishing: update source, ZIP and these notes together after meaningful tested
+milestones. Inspect the remote head first; retain existing work and use a
+fast-forward update. Do not publish .validation, WTF, local backups, screenshots,
+credentials, game-account data or dependency caches.

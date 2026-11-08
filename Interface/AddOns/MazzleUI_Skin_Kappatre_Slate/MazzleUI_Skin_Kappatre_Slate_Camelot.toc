@@ -1,0 +1,4 @@
+## Interface: 16001
+## Title: MazzleUI_Skin_Kappatre_Slate
+## Notes: Original MazzleUI artwork. No legacy code is loaded on Forever.
+## LoadOnDemand: 1
